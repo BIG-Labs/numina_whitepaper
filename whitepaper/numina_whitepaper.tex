@@ -81,31 +81,52 @@
 
 \section{Introduction}
 \label{sec:introduction}
-	Numina essentially consists in a set of pools in which users are able to deposit a specific asset (different for each pool). These users are addressed as \textit{liquidity providers} and the asset they provide to the pool will be referred to as \textit{Rogatio}.
-	\par Users can borrow Rogatio from the pool by providing a specific asset as collateral: they will be called \textit{borrowers} and the asset deposited as collateral will be reffered to as \textit{Oblatio}.
-	\par As already mentioned, Numina is composed by different pools that are independent from each other. Thus, users can choose to which pool provide liquidity, that is they can choose to which Oblatio (collateral) expose themselves.
+	Numina essentially consists in a set of pools in which users are able to deposit a specific asset (different for each pool). These users are addressed as \textit{liquidity providers} and the asset they provide to the pool will be referred to as \textit{Core}.
+	\par Users can also borrow Core from the pool by providing a specific asset as \textit{Collateral}: they will be referred to as \textit{borrowers}.
+	\par As already mentioned, Numina is composed by different pools that are independent from each other. Thus, users can choose to which pool provide liquidity, that is they can choose to which Collateral expose themselves.
 	\par The pools will track assets through the following quantities.
 	\begin{itemize}
-		\item \textbf{Rogatio available}: total amount of Rogatio assets that are available to be borrowed.
-		\item \textbf{Rogatio locked}: total amount of Rogatio assets that has been issued as loans.
-		\item \textbf{Oblatio locked}: total amount of Oblatio assets deposited in the pool as collateral for current loans.
-		\item \textbf{Oblatio available}: total amount of Oblatio assets within the pool that are not related to any loan. They result from extinguished debt position (see section \ref{sec:duration}).
+		\item \textbf{Core available}: total amount of Core assets that are available to be borrowed.
+		\item \textbf{Core locked}: total amount of Core assets that has been issued as loans.
+		\item \textbf{Collateral locked}: total amount of Collateral assets deposited in the pool in order to borrow Core.
+		\item \textbf{Collateral available}: total amount of Collateral assets within the pool that are not related to any loan. They result from extinguished debt position (see section \ref{sec:duration}).
 	\end{itemize} 
 	Now that the main elements of Numina have been presented, this paper will examine in depth some aspects of the protocol. Section \ref{sec:lptoken} provides detailed information on how LP tokens are distributed and how the protocol compute their value. Section \ref{sec:duration} explains when debt are extinguished. Section \ref{sec:interest} describes how interest is computed. Section ........ Finally, section \ref{sec:conclusions} concludes the paper. 
 	
 \section{Liquidity Provider Tokens}
 \label{sec:lptoken}
-	Liquidity providers play a pivotal role within Numina ecosystem, since they enhance liquidity by contributing to the Rogatio asset. In return for their service, the pool issues \textit{Liquidity Provider Token} (\textit{LPT}): these tokens serve as a receipt and represent the share of the pool belonging to the provider.
-	\par In order to determine the precise quantity of LPTs minted for a liquidity provider, it must first defined the total value of a liquidity pool.
-	\begin{equation}
-		PV = Rogatio\ available + Oblatio\ available + Rogatio\ locked
-	\end{equation}
-	$PV$ is the total value of the pool. Note that all assets are evaluated with respect to the
-	\par When a user provide liquidity to the pool, a certain amount of LPTs will be minted and sent to him according to the following formula:
-	\begin{equation}
-		LPT\ minted = \frac{Rogatio\ provided}{PV * LPTs\ issued}
-	\end{equation}
-	Where $Rogatio\ provided$ is the amount of Rogatio tokens deposited by the users and $LPTs\ issued$ is the total amount of LPTs minted before the moment of deposit.
+	Liquidity providers play a pivotal role within Numina ecosystem, since they enhance liquidity by contributing to the Core asset. In return for their service, the pool issues \textit{Liquidity Provider Tokens} (\textit{LPTs}): these tokens serve as a receipt and represent the share of the pool belonging to the provider.
+	
+	\subsection{LPTs issue}
+	\label{subsec:issue}
+		When a user provide liquidity to the pool, a certain amount of LPTs will be minted and sent to him. In order to determine the precise quantity of LPTs, it must be first defined the total value of a liquidity pool.
+		\begin{equation}
+			PV = Core\ available + Collateral\ available + Core\ locked
+		\end{equation}
+		$PV$ is the total value of the pool. Note that all assets are evaluated with respect to the Core. As an example, consider the pool between USDC (Core) and BTC (Collateral) and assume that $1 \, BTC = 20,000 \, USDC$. If:
+		\begin{equation*}
+			\begin{split}
+				&Core\ available = 100,000 \, USDC\\
+				&Collateral\ available = 0.5 \, BTC\\
+				&Core\ locked = 30,000 \, USDC\\
+			\end{split}
+		\end{equation*}
+		Then we can evaluate the total value as:
+		\begin{equation*}
+			PV = 100,000 \, USDC + (0.5*20,000) \, USDC + 30,000 \, USDC = 140,000 \, USDC
+		\end{equation*}
+		Now that is clear how to evaluate $PV$, it is possible to use the following formula to compute the amount of LPTs minted when providing Core to the pool:
+		\begin{equation}
+			LPTs\ minted = \frac{Core\ provided}{PV * LPTs\ issued}
+		\end{equation}
+		Where:
+		\begin{itemize}
+			\item \textbf{Core provided} is the amount of Core tokens deposited by the liquidity provider.
+			\item \textbf{LPTs issued} is the number of LPTs minted before the moment of the deposit.
+		\end{itemize}
+		
+	\subsection{LPTs redemption}
+	\label{subsec:redemption}
 
 \section{Loan duration}
 \label{sec:duration}
