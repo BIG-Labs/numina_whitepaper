@@ -82,14 +82,14 @@
 \section{Introduction}
 \label{sec:introduction}
 	Numina essentially consists in a set of pools in which users are able to deposit a specific asset (different for each pool). These users are addressed as \textit{liquidity providers} and the asset they provide to the pool will be referred to as \textit{Core}.
-	\par Users can also borrow Core from the pool by providing a specific asset as \textit{Collateral}: they will be referred to as \textit{borrowers}.
+	\par Users can also borrow Core from the pool by providing a specific asset as \textit{Collateral}: they will be referred to as \textit{borrowers} and the amount of Core they receive is dictated by LTV (see subsection \ref{subsec:ltv}).
 	\par As already mentioned, Numina is composed by different pools that are independent from each other. Thus, users can choose to which pool provide liquidity, that is they can choose to which Collateral expose themselves.
 	\par The pools will track assets through the following quantities.
 	\begin{itemize}
-		\item \textbf{Core available}: total amount of Core assets that are available to be borrowed.
-		\item \textbf{Core locked}: total amount of Core assets that has been issued as loans.
-		\item \textbf{Collateral locked}: total amount of Collateral assets deposited in the pool in order to borrow Core.
-		\item \textbf{Collateral available}: total amount of Collateral assets within the pool that are not related to any loan. They result from extinguished debt position (see section \ref{sec:duration}).
+		\item \textbf{aCore (available Core)}: total amount of Core assets that are available to be borrowed.
+		\item \textbf{lCore (locked Core)}: total amount of Core assets that has been issued as loans.
+		\item \textbf{lCollateral (locked Collateral)}: total amount of Collateral assets deposited in the pool by users to borrow Core.
+		\item \textbf{aCollateral (available Collateral)}: total amount of Collateral assets within the pool that are not related to any loan. They result from extinguished debt position (see section \ref{sec:duration}).
 	\end{itemize} 
 	Now that the main elements of Numina have been presented, this paper will examine in depth some aspects of the protocol. Section \ref{sec:lptoken} provides detailed information on how LP tokens are distributed and how the protocol compute their value. Section \ref{sec:duration} explains when debt are extinguished. Section \ref{sec:interest} describes how interest is computed. Section ........ Finally, section \ref{sec:conclusions} concludes the paper. 
 	
@@ -101,14 +101,14 @@
 	\label{subsec:issue}
 		When a user provide liquidity to the pool, a certain amount of LPTs will be minted and sent to him. In order to determine the precise quantity of LPTs, it must be first defined the total value of a liquidity pool.
 		\begin{equation}
-			PV = Core\ available + Collateral\ available + Core\ locked
+			PV = aCore + aCollateral + lCore
 		\end{equation}
 		$PV$ is the total value of the pool. Note that all assets are evaluated with respect to the Core. As an example, consider the pool between USDC (Core) and BTC (Collateral) and assume that $1 \, BTC = 20,000 \, USDC$. If:
 		\begin{equation*}
 			\begin{split}
-				&Core\ available = 100,000 \, USDC\\
-				&Collateral\ available = 0.5 \, BTC\\
-				&Core\ locked = 30,000 \, USDC\\
+				aCore &= 100,000 \, USDC\\
+				aCollateral &= 0.5 \, BTC\\
+				lCore &= 30,000 \, USDC\\
 			\end{split}
 		\end{equation*}
 		Then we can evaluate the total value as:
@@ -130,9 +130,21 @@
 
 \section{Loan duration}
 \label{sec:duration}
-
+	Diverging from traditional lending protocols, Numina introduces a predetermined lifespan for loans. When borrowing Core, users are asked to choose a certain period of time within which they are obliged to close their debt position. They can choose the amount of time that they prefer as long as it is inferior to a maximum time span established by the protocol: this time span will be different from one pool to another.
+	\par Users can repay their debt at any moment, however, in case the deadline is surpassed and the borrower has not closed his position, the debt is extinguished. As a result, the amount of lCore of the pool will decrease, while the lCollateral associated to the debt position will be converted into aCollateral and proportionally distributed among liquidity providers.
+	
+	\subsection{LTV}
+	\label{subsec:ltv}
+		when a users borrow
+		Every debt position is characterized by the \textit{Loan-to-Value ratio} (\textit{LTV}). This parameter is the ratio between the USD value of Core borrowed by the user and the USD value of Collateral deposited into the pool. The higher the LTV, the more lucrative  it becomes for borrower to initiate a loan.
+		\par In case the Collateral USD value surpasses the Core USD value ($LTV>1$), the debt position cannot be closed until the deadline initially set by the borrower. This feature is designed to ensure a robust and structured approach, maintaining the integrity of the lending process and offering both borowers and liquidity providers a clear understanding of their commitments within Numina protocol.
+		
 \section{Interest model}
 \label{sec:interest}
+	In traditional lending protocols, liquidity providers are those most exposed to losses. The interest model aims to guarantee liquidity providers a substantial 
+	\begin{equation}
+		UR = \frac{lCore}{lCore + aCore}
+	\end{equation}
 
 \section{External swaps}
 
