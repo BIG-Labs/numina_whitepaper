@@ -103,7 +103,7 @@
 		\begin{equation}
 			PV = aCore + aCollateral + lCore
 		\end{equation}
-		$PV$ is the total value of the pool. Note that all assets are evaluated with respect to the Core. As an example, consider the pool between USDC (Core) and BTC (Collateral) and assume that $1 \, BTC = 20,000 \, USDC$. If:
+		$PV$ is the total value of the pool. Note that, for the formula to be consistent, all assets are evaluated with respect to the Core. As an example, consider the pool between USDC (Core) and BTC (Collateral) and assume that $1 \, BTC = 20,000 \, USDC$. If:
 		\begin{equation*}
 			\begin{split}
 				aCore &= 100,000 \, USDC\\
@@ -117,27 +117,52 @@
 		\end{equation*}
 		Now that is clear how to evaluate $PV$, it is possible to use the following formula to compute the amount of LPTs minted when providing Core to the pool:
 		\begin{equation}
-			LPTs\ minted = \frac{Core\ provided}{PV * LPTs\ issued}
+			LPTs\ minted = \frac{Core\ provided}{PV}*LPTs\ supply
 		\end{equation}
 		Where:
 		\begin{itemize}
 			\item \textbf{Core provided} is the amount of Core tokens deposited by the liquidity provider.
-			\item \textbf{LPTs issued} is the number of LPTs minted before the moment of the deposit.
+			\item \textbf{LPTs supply} is the total number of LPTs issued and actually in circulation at the moment of the deposit.
 		\end{itemize}
 		
 	\subsection{LPTs redemption}
 	\label{subsec:redemption}
-
+	Liquidity providers can withdraw their share of the pool (or just a part of it) at any moment by sending to the protocol the totality of their LPTs (or just a part of it). Numina evaluates the value of these LPTs according to the following formula.
+	\begin{equation}
+		LPTs\ value = \frac{LPTs\ withdraw}{LPTs\ supply}*PV
+	\end{equation}
+	Where:
+	\begin{itemize}
+		\item $LPTs\ value$ is the value of LPTs sent to the protocol for the withdraw. It is evaluated with respect to the Core asset, similarly to the $PV$, and it represents the amount of assets that the liquidity provider will receive back.
+		\item $LPTs\ withdraw$ is the number of LPTs send to the protocol in order to withdraw liquidity.
+		\item $LPTs\ supply$ is the total number of LPTs issued and actually in circulation at the moment of the withdraw.
+	\end{itemize}
+	The share of the pool belonging to the liquidity provider is composed by Core and Collateral. The protocol uses the parameter $r$ to evaluate this two quantities starting from the $LPTs\ value$ computed before.
+	\begin{equation}
+		r = \frac{aCore}{aCollateral + aCore}
+	\end{equation}
+	For the formula to be consistent, $aCollateral$ is evaluated with respect to Core, as already done for $PV$ and $LPTs\ value$.
+	\begin{equation}
+		Core\ withdraw = r * LPTs\ value
+	\end{equation}
+	\begin{equation}
+		Collateral\ withdraw = (1-r) * LPTs\ value
+	\end{equation}
+	Where $Core\ withdraw$ and $Collateral\ withdraw$ are respectively the amount of Core tokens and Colateral tokens received by the liquidity provider at the end of the withdraw.
 \section{Loan duration}
 \label{sec:duration}
-	Diverging from traditional lending protocols, Numina introduces a predetermined lifespan for loans. When borrowing Core, users are asked to choose a certain period of time within which they are obliged to close their debt position. They can choose the amount of time that they prefer as long as it is inferior to a maximum time span established by the protocol: this time span will be different from one pool to another.
+	Diverging from traditional lending protocols, Numina introduces a predetermined lifespan for loans. When borrowing Core, users are asked to choose a certain period of time within which they are obliged to close their debt position. They can choose the amount of time that they prefer as long as it is inferior to a maximum time span established by the protocol: this time span will be different for each pool.
 	\par Users can repay their debt at any moment, however, in case the deadline is surpassed and the borrower has not closed his position, the debt is extinguished. As a result, the amount of lCore of the pool will decrease, while the lCollateral associated to the debt position will be converted into aCollateral and proportionally distributed among liquidity providers.
 	
 	\subsection{LTV}
 	\label{subsec:ltv}
-		when a users borrow
-		Every debt position is characterized by the \textit{Loan-to-Value ratio} (\textit{LTV}). This parameter is the ratio between the USD value of Core borrowed by the user and the USD value of Collateral deposited into the pool. The higher the LTV, the more lucrative  it becomes for borrower to initiate a loan.
-		\par In case the Collateral USD value surpasses the Core USD value ($LTV>1$), the debt position cannot be closed until the deadline initially set by the borrower. This feature is designed to ensure a robust and structured approach, maintaining the integrity of the lending process and offering both borowers and liquidity providers a clear understanding of their commitments within Numina protocol.
+		The \textit{initial Loan-to-Value ratio} (\textit{iLTV}) is a parameter of the pool and it dictates the quantity of Core a user can borrow given a certain quantitiy of Collateral.
+		\begin{equation}
+			Core\ borrowed = iLTV * Collateral\ deposited
+		\end{equation}
+		This parameter is always set to be less than 1 and it is different for each pool. The higher the iLTV, the more lucrative  it becomes for borrower to initiate a loan.
+		\par Since the value of Core and Collateral can change during the loan, the protocol associates to every debt position a \textit{LTV} (\textit{Loan-to-Value ratio}). This parameter is the ratio between the value of Core borrowed by the user and the value (with respect to Core) of Collateral deposited into the pool.
+		\par In case the deposited Collateral value surpasses the borrowed Core value ($LTV>1$), the debt position cannot be closed until the deadline initially set by the borrower. This feature is designed to ensure a robust and structured approach, maintaining the integrity of the lending process and offering both borrowers and liquidity providers a clear understanding of their commitments within Numina protocol.
 		
 \section{Interest model}
 \label{sec:interest}
