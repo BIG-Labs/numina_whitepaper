@@ -61,7 +61,7 @@
 %\end{table}
 
 \title{Numina: a Multi-Chain Lending Protocol with Zero Liquidations.}
-\author{last-ancestor, 0x7183}
+\author{last-ancestor, Rhaki, 0x7183}
 \date{}
 
 
@@ -72,7 +72,7 @@
 %\renewcommand{\abstract}{\textbf{Introduction}\\}
 
 \begin{abstract}
-	Numina is a lending protocol presenting peculiar features that distinguish it from most of the protocol of this type. First of all, Numina will not provide for liquiditations, thus ensuring the safety of users assets. In the second instance, it will be multi-chain from the date of it launch,  addressing interoperability challenges that often plague decentralized platforms.
+	Numina is a lending protocol presenting peculiar features that distinguish itself from most protocols of this type. First of all, Numina will not provide for liquiditations, thus ensuring the safety of users assets: on the other hand, borrowers will choose for a lending time when opening a new position. In the second instance, the protocol will be multi-chain from the date of its launch, addressing interoperability challenges that often plague decentralized platforms.
 \end{abstract}
 	
 %\newpage
@@ -82,7 +82,7 @@
 \section{Introduction}
 \label{sec:introduction}
 	Numina essentially consists in a set of pools in which users are able to deposit a specific asset (different for each pool). These users are addressed as \textit{liquidity providers} and the asset they provide to the pool will be referred to as \textit{Core}.
-	\par Users can also borrow Core from the pool by providing a specific asset as \textit{Collateral}: they will be referred to as \textit{borrowers} and the amount of Core they receive is dictated by LTV (see subsection \ref{subsec:ltv}).
+	\par Users can also borrow Core from the pool by providing a different asset as \textit{Collateral}: they will be referred to as \textit{borrowers} and the amount of Core they will receive is dictated by iLTV (see subsection \ref{subsec:ltv}).
 	\par As already mentioned, Numina is composed by different pools that are independent from each other. Thus, users can choose to which pool provide liquidity, that is they can choose to which Collateral expose themselves.
 	\par Pools source prices from an oracle contract and track assets through the following quantities.
 	\begin{itemize}
@@ -91,7 +91,8 @@
 		\item \textbf{lCollateral (locked Collateral)}: total amount of Collateral assets deposited in the pool by users to borrow Core.
 		\item \textbf{aCollateral (available Collateral)}: total amount of Collateral assets within the pool that are not related to any loan. They result from extinguished debt position (see section \ref{sec:duration}).
 	\end{itemize}
-	Now that Numina main elements have been presented, this paper will examine in depth some aspects of the protocol. Section \ref{sec:lptoken} provides detailed information on how LP tokens are distributed and how the protocol compute their value. Section \ref{sec:duration} explains when debt are extinguished. Section \ref{sec:interest} describes how interest is computed. Section ........ Finally, section \ref{sec:conclusions} concludes the paper. 
+	Decentralized platforms often suffer from interoperability challenges. For this reason Numina will be multi-chain since the day of its launch.
+	\par Now that the protocol main elements have been presented, this paper will examine in depth some aspects of it. Section \ref{sec:lptoken} provides detailed information on how LP tokens are distributed and how the protocol compute their value. Section \ref{sec:duration} explains how debt positions are managed by the protocol. Section \ref{sec:interest} describes how interest is computed. Section \ref{sec:extswap} illustrates when and how an external user can buy collateral of a pool. Finally, section \ref{sec:conclusions} concludes the paper. 
 	
 \section{Liquidity Provider Tokens}
 \label{sec:lptoken}
@@ -103,7 +104,7 @@
 		\begin{equation}
 			PV = aCore + aCollateral + lCore
 		\end{equation}
-		$PV$ is the total value of the pool. Note that, for the formula to be consistent, all assets are evaluated with respect to the Core. As an example, consider the pool between USDC (Core) and BTC (Collateral) and assume that $1 \, BTC = 20,000 \, USDC$. If:
+		$PV$ is the total value of the pool. Note that, for the formula to be consistent, all assets are evaluated with respect to the Core. As an example, consider the pool between USDC (Core) and BTC (Collateral) and assume that $1 \, BTC = 20,000 \, USDC$. If we have that:
 		\begin{equation*}
 			\begin{split}
 				aCore &= 100,000 \, USDC\\
@@ -133,9 +134,9 @@
 	\end{equation}
 	Where:
 	\begin{itemize}
-		\item $LPTs\ value$ is the value of LPTs sent to the protocol for the withdraw. It is evaluated with respect to the Core asset, similarly to the $PV$, and it represents the amount of assets that the liquidity provider will receive back.
-		\item $LPTs\ withdraw$ is the number of LPTs send to the protocol in order to withdraw liquidity.
-		\item $LPTs\ supply$ is the total number of LPTs issued and actually in circulation at the moment of the withdraw.
+		\item \textbf{LPTs\ value} is the value of LPTs sent to the protocol for the withdraw. It is evaluated with respect to the Core asset, similarly to the $PV$, and it represents the amount of assets that the liquidity provider will receive back.
+		\item \textbf{LPTs\ withdraw} is the number of LPTs send to the protocol in order to withdraw liquidity.
+		\item \textbf{LPTs\ supply} is the total number of LPTs issued and actually in circulation at the moment of the withdraw.
 	\end{itemize}
 	The share of the pool belonging to the liquidity provider is composed by Core and Collateral. The protocol uses the parameter $r$ to evaluate this two quantities starting from the $LPTs\ value$ computed before.
 	\begin{equation}
@@ -151,7 +152,7 @@
 	Where $Core\ withdraw$ and $Collateral\ withdraw$ are respectively the amount of Core tokens and Colateral tokens received by the liquidity provider at the end of the withdraw.
 \section{Loan duration}
 \label{sec:duration}
-	Diverging from traditional lending protocols, Numina introduces a predetermined lifespan for loans. When borrowing Core, users are asked to choose a certain period of time within which they are obliged to close their debt position. They can choose the amount of time that they prefer as long as it is inferior to a maximum time span established by the protocol: this time span will be different for each pool.
+	Diverging from traditional lending protocols, Numina introduces a predetermined life span for loans. When borrowing Core, users are asked to choose a certain period of time within which they are obliged to close their debt position. They can choose the amount of time that they prefer as long as it is inferior to a maximum time span established by the protocol: this time span will be different for each pool.
 	\par Users can repay their debt at any moment, however, in case the deadline is surpassed and the borrower has not closed his position, the debt is extinguished. As a result, the amount of lCore of the pool will decrease, while the lCollateral associated to the debt position will be converted into aCollateral and proportionally distributed among liquidity providers.
 	
 	\subsection{LTV}
@@ -186,6 +187,18 @@
 
 \section{Conclusions}
 \label{sec:conclusions}
+	This paper presented Numina, an innovative protocol that aims to introduce a new class of zero-liquidation lending protocols. Users will choose the life span of their own loan, while the protocol will only apply restrictions on maximum duration and on LTV of debt positions.
+	\par Numina provides a seamless process for liquidity providers to contribute and withdraw assets and it ensures a fair and transparent allocations of LPTs according to the participation in the pool. Interest models are designed in order to guarantee substantial incentives for liquidity providers, thanks to the Utilization Ratio. The possibility of external swaps creates more arbitrage opportunities, enhance flexibility and generates additional profits for providers. Lastly, Numina addresses interoperability challanges by being a multi-chain platform since its launch.
+	
+\begin{thebibliography}{99}
+	\bibitem{bitcoin} Satoshi Nakamoto. \textbf{Bitcoin: A Peer-toPeer Electronic Cash System}
+	
+	\bibitem{ethereum}  Vitalik Buterin. \textbf{Ethereum: A Next-Generation Smart Contract and Decentralized Application Platform}
+	
+	\bibitem{gol} Tareq Ahram, Arman Sargolzaei, Saman Sargolzaei, Jeff Daniels and Ben Amaba. \textbf{Blockchain technology innovations}
+	
+	\bibitem{defi} Johannes Rude Jensen, Victor von Wachter and Omri Ross. \textbf{An Introduction to Decentralized Finance (DeFi)}.
+	
+\end{thebibliography}
 
-	This paper presented Numina
 \end{document}
